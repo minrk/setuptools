@@ -471,6 +471,12 @@ class FileList(_FileList):
     def extend(self, paths):
         self.files.extend(filter(self._safe_path, paths))
 
+    def _ensure_relative(self):
+        """
+        Ensure paths in manifest are relative to the current directory
+        """
+        self.files = list(map(os.path.relpath, self.files))
+
     def _repair(self):
         """
         Replace self.files with only safe paths
@@ -525,6 +531,7 @@ class manifest_maker(sdist):
         if os.path.exists(self.template):
             self.read_template()
         self.prune_file_list()
+        self.filelist._ensure_relative()
         self.filelist.sort()
         self.filelist.remove_duplicates()
         self.write_manifest()
